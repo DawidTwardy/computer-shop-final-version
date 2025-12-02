@@ -1,14 +1,155 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
+// dawidtwardy/computer-shop-lab10-dawidtwardy/computer-shop-lab10-dawidtwardy-lab11/prisma/schema.prisma
 
 datasource db {
   provider = "postgresql"
+  // Linia `url = env("DATABASE_URL")` ZOSTAŁA USUNIĘTA zgodnie z wymogami Prisma 7.0+
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------------------------
+// ENUM: OrderStatus (Status zamówienia)
+// ------------------------------------
+enum OrderStatus {
+  PENDING    // Oczekujące na realizację
+  PROCESSING // W trakcie realizacji
+  SHIPPED    // Wysłane
+  DELIVERED  // Dostarczone
+  CANCELLED  // Anulowane
+}
+
+// ------------------------------------
+// 1. Model Category (Kategorie produktów)
+// ------------------------------------
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique // Nazwa kategorii (unikalna)
+  products Product[]
+}
+
+// ------------------------------------
+// 2. Model Product (Produkty)
+// ------------------------------------
+model Product {
+  id          Int        @id @default(autoincrement())
+  code        String     @unique // Kod produktu (unikalny)
+  name        String
+  type        String     // Typ produktu (np. "procesor")
+  description String?    @db.Text // Opis produktu (opcjonalny)
+  price       Float      // Cena (z dwoma miejscami po przecinku)
+  amount      Int        // Stan magazynowy (liczba sztuk)
+  image       String?    // Ścieżka do obrazka (opcjonalna)
+  createdAt   DateTime   @default(now()) // Data utworzenia (automatyczna)
+  updatedAt   DateTime   @updatedAt     // Data ostatniej aktualizacji (automatyczna)
+  
+  // Relacja 1:M (do Category)
+  categoryId  Int
+  category    Category   @relation(fields: [categoryId], references: [id])
+
+  // Relacje M:M (przez tabele pośrednie)
+  cartItems   CartItem[] 
+  orderItems  OrderItem[]
+  
+  @@index([categoryId]) // Indeks na categoryId
+  @@index([code])       // Indeks na code
+}
+
+// ------------------------------------
+// 3. Model User (Użytkownicy)
+// ------------------------------------
+model User {
+  id          Int         @id @default(autoincrement())
+  email       String      @unique // Email (unikalny)
+  name        String?     // Imię i nazwisko (opcjonalne)
+  password    String      @db.Text // Hasło (hash)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relacje
+  cart        Cart?       // Może mieć jeden koszyk (1:1)
+  orders      Order[]     // Może mieć wiele zamówień (1:M)
+}
+
+// ------------------------------------
+// 4. Model Cart (Koszyk)
+// ------------------------------------
+model Cart {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relacja 1:1 (unikalne powiązanie z User)
+  userId      Int         @unique
+  user        User        @relation(fields: [userId], references: [id])
+
+  // Elementy koszyka
+  items       CartItem[]
+}
+
+// ------------------------------------
+// 5. Model CartItem (Produkty w koszyku)
+// ------------------------------------
+model CartItem {
+  id          Int         @id @default(autoincrement())
+  quantity    Int         @default(1) // Ilość produktu (domyślnie 1)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Klucze obce
+  cartId      Int
+  cart        Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade) // Usunięcie koszyka usuwa CartItem
+
+  productId   Int
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade) // Usunięcie produktu usuwa CartItem
+
+  // Ograniczenie unikalnej pary
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+}
+
+// ------------------------------------
+// 6. Model Order (Zamówienia)
+// ------------------------------------
+model Order {
+  id            Int         @id @default(autoincrement())
+  orderNumber   String      @unique @default(cuid()) // Numer zamówienia (unikalny, automatyczny)
+  status        OrderStatus @default(PENDING) // Status zamówienia (enum)
+  totalAmount   Float // Całkowita kwota
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Powiązanie z użytkownikiem
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id])
+  
+  // Zawiera elementy zamówienia
+  items         OrderItem[]
+
+  @@index([userId])
+  @@index([orderNumber])
+}
+
+// ------------------------------------
+// 7. Model OrderItem (Produkty w zamówieniu)
+// ------------------------------------
+model OrderItem {
+  id            Int       @id @default(autoincrement())
+  quantity      Int
+  priceAtOrder  Float     // Cena w momencie zakupu
+  productName   String    // Kopia nazwy produktu
+  productCode   String    // Kopia kodu produktu
+  
+  // Klucze obce
+  orderId       Int
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade) // Usunięcie zamówienia usuwa OrderItem
+
+  productId     Int?      // Powiązanie z produktem (opcjonalne)
+  // Gdy produkt usunięty -> NIE usuwaj OrderItem (Restrict)
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
 }

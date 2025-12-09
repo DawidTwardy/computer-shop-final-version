@@ -1,4 +1,3 @@
-// dawidtwardy/computer-shop-lab10-dawidtwardy/computer-shop-lab10-dawidtwardy-lab11/prisma.config.ts
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 

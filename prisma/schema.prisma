@@ -2,7 +2,6 @@
 
 datasource db {
   provider = "postgresql"
-  // Linia `url = env("DATABASE_URL")` ZOSTAŁA USUNIĘTA zgodnie z wymogami Prisma 7.0+
 }
 
 generator client {

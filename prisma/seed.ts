@@ -1,5 +1,6 @@
 // dawidtwardy/computer-shop-lab10-dawidtwardy/computer-shop-lab10-dawidtwardy-lab11/prisma/seed.ts
 
+import "dotenv/config";
 import { PrismaClient, OrderStatus } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -43,7 +44,7 @@ async function main() {
     type: p.type, 
   }));
   
-  const productCreationData = productsToSeed.map(({ id, type, ...rest }: any) => ({ 
+  const productCreationData = productsToSeed.map(({ id, date, ...rest }: any) => ({ 
     ...rest, 
   })); 
   

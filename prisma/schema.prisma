@@ -1,64 +1,49 @@
-// prisma/schema.prisma
-
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// ------------------------------------
-// ENUM: OrderStatus (Status zamówienia)
-// ------------------------------------
 enum OrderStatus {
-  PENDING    // Oczekujące na realizację
-  PROCESSING // W trakcie realizacji
-  SHIPPED    // Wysłane
-  DELIVERED  // Dostarczone
-  CANCELLED  // Anulowane
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
-// ------------------------------------
-// 1. Model Category (Kategorie produktów)
-// ------------------------------------
 model Category {
   id       Int       @id @default(autoincrement())
-  name     String    @unique // Nazwa kategorii (unikalna)
+  name     String    @unique
   products Product[]
 }
 
-// ------------------------------------
-// 2. Model Product (Produkty)
-// ------------------------------------
 model Product {
   id          Int        @id @default(autoincrement())
-  code        String     @unique // Kod produktu (unikalny)
+  code        String     @unique
   name        String
-  type        String     // Typ produktu (np. "procesor")
-  description String?    @db.Text // Opis produktu (opcjonalny)
-  price       Float      // Cena (z dwoma miejscami po przecinku)
-  amount      Int        // Stan magazynowy (liczba sztuk)
-  image       String?    // Ścieżka do obrazka (opcjonalna)
-  createdAt   DateTime   @default(now()) // Data utworzenia (automatyczna)
-  updatedAt   DateTime   @updatedAt     // Data ostatniej aktualizacji (automatyczna)
+  type        String
+  description String?    @db.Text
+  price       Float
+  amount      Int
+  image       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   
-  // Relacja 1:M (do Category)
   categoryId  Int
   category    Category   @relation(fields: [categoryId], references: [id])
 
-  // Relacje M:M (przez tabele pośrednie)
   cartItems   CartItem[] 
   orderItems  OrderItem[]
   
-  @@index([categoryId]) // Indeks na categoryId
-  @@index([code])       // Indeks na code
+  @@index([categoryId])
+  @@index([code])
 }
 
-// ------------------------------------
-// 3. Modele Auth.js + User
-// ------------------------------------
-// For Authorization with Auth.js
+// Auth.js Models
 model Account {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
@@ -97,8 +82,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-
-  // Dodanie obsługi wymaganej w modelach danych tej aplikacji
+  
   cart          Cart?
   orders        Order[]
 
@@ -114,82 +98,62 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// ------------------------------------
-// 4. Model Cart (Koszyk) - Zaktualizowany userId
-// ------------------------------------
 model Cart {
   id          Int         @id @default(autoincrement())
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   
-  // Relacja 1:1 (unikalne powiązanie z User)
-  userId      String      @unique // ZMIANA: Z Int na String
+  userId      String      @unique
   user        User        @relation(fields: [userId], references: [id])
 
-  // Elementy koszyka
   items       CartItem[]
 }
 
-// ------------------------------------
-// 5. Model CartItem (Produkty w koszyku)
-// ------------------------------------
 model CartItem {
   id          Int         @id @default(autoincrement())
-  quantity    Int         @default(1) // Ilość produktu (domyślnie 1)
+  quantity    Int         @default(1)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  // Klucze obce
   cartId      Int
-  cart        Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade) // Usunięcie koszyka usuwa CartItem
+  cart        Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   productId   Int
-  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade) // Usunięcie produktu usuwa CartItem
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  // Ograniczenie unikalnej pary
   @@unique([cartId, productId])
   @@index([cartId])
   @@index([productId])
 }
 
-// ------------------------------------
-// 6. Model Order (Zamówienia) - Zaktualizowany userId
-// ------------------------------------
 model Order {
   id            Int         @id @default(autoincrement())
-  orderNumber   String      @unique @default(cuid()) // Numer zamówienia (unikalny, automatyczny)
-  status        OrderStatus @default(PENDING) // Status zamówienia (enum)
-  totalAmount   Float // Całkowita kwota
+  orderNumber   String      @unique @default(cuid())
+  status        OrderStatus @default(PENDING)
+  totalAmount   Float
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
-  // Powiązanie z użytkownikiem
-  userId        String // ZMIANA: Z Int na String
+  userId        String
   user          User        @relation(fields: [userId], references: [id])
   
-  // Zawiera elementy zamówienia
   items         OrderItem[]
 
   @@index([userId])
   @@index([orderNumber])
 }
 
-// ------------------------------------
-// 7. Model OrderItem (Produkty w zamówieniu)
-// ------------------------------------
 model OrderItem {
   id            Int       @id @default(autoincrement())
   quantity      Int
-  priceAtOrder  Float     // Cena w momencie zakupu
-  productName   String    // Kopia nazwy produktu
-  productCode   String    // Kopia kodu produktu
+  priceAtOrder  Float
+  productName   String
+  productCode   String
   
-  // Klucze obce
   orderId       Int
-  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade) // Usunięcie zamówienia usuwa OrderItem
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId     Int?      // Powiązanie z produktem (opcjonalne)
-  // Gdy produkt usunięty -> NIE usuwaj OrderItem (Restrict)
+  productId     Int?
   product       Product?  @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   @@index([orderId])

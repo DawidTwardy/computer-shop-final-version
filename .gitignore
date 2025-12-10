@@ -47,3 +47,4 @@ coverage
 /prisma/migrations
 /prisma/dev.db
 /prisma/schema.prisma.bak
+node_modules/

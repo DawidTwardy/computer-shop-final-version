@@ -4,9 +4,9 @@ import { defineConfig } from "@prisma/config";
 export default defineConfig({
   // Wskazujemy gdzie leży schemat
   schema: "prisma/schema.prisma",
-  // Konfiguracja bazy danych
+  // Konfiguracja bazy danych (pobiera adres z Vercel ENV)
   datasource: {
     provider: "postgresql",
-    url: process.env.DATABASE_URL, // Tutaj Prisma pobierze adres z Vercel
+    url: process.env.DATABASE_URL, 
   },
 });

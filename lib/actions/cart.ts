@@ -1,9 +1,8 @@
-// lib/actions/cart.ts
 "use server"
 
 import { prisma } from "../db"
 import { revalidatePath } from "next/cache"
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client"
 
 // Akcja: Dodanie do koszyka (addToCart)
 export async function addToCart(productId: number, userId: string, quantity: number = 1) {
@@ -117,7 +116,7 @@ export async function transferCart(fromUserId: string, toUserId: string) {
   })
 
   revalidatePath("/basket")
-  return { success: true }
+  return { success: true, message: "Przeniesiono pomyślnie" }
 }
 
 // Akcja: Czyszczenie koszyka (clearCart)
@@ -142,41 +141,51 @@ export async function removeItemFromCart(userId: string, productId: number) {
   }
 }
 
-// Akcja: Składanie zamówienia (placeOrder)
-export async function placeOrder(userId: string, cartId: number) {
-  const DISCOUNT_RATE = 0.9;
+// Akcja: Składanie zamówienia (placeOrder) - ZINTEGROWANA WERSJA
+export async function placeOrder(userId: string) {
   const cart = await prisma.cart.findUnique({
-    where: { id: cartId },
+    where: { userId },
     include: { items: { include: { product: true } } },
   });
 
-  if (!cart || cart.items.length === 0) {
-    throw new Error("Koszyk jest pusty");
+  if (!cart) {
+    return { success: false, message: "Koszyk nie znaleziony" };
   }
+  if (cart.items.length === 0) {
+    return { success: false, message: "Koszyk jest pusty" };
+  }
+  
+  try {
+    const DISCOUNT_RATE = 0.9;
+    
+    const totalAmount = cart.items.reduce((sum, item) =>
+      sum + (item.product.price * DISCOUNT_RATE) * item.quantity, 0
+    );
 
-  const totalAmount = cart.items.reduce((sum, item) =>
-    sum + (item.product.price * DISCOUNT_RATE) * item.quantity, 0
-  );
-
-  const order = await prisma.order.create({
-    data: {
-      userId,
-      totalAmount: parseFloat(totalAmount.toFixed(2)),
-      status: OrderStatus.PENDING, 
-      items: {
-        create: cart.items.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          priceAtOrder: parseFloat((item.product.price * DISCOUNT_RATE).toFixed(2)),
-          productName: item.product.name,
-          productCode: item.product.code,
-        })),
+    await prisma.order.create({
+      data: {
+        userId,
+        totalAmount: parseFloat(totalAmount.toFixed(2)),
+        status: OrderStatus.PENDING, 
+        items: {
+          create: cart.items.map((item) => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            priceAtOrder: parseFloat((item.product.price * DISCOUNT_RATE).toFixed(2)),
+            productName: item.product.name,
+            productCode: item.product.code,
+          })),
+        },
       },
-    },
-  });
+    });
 
-  await prisma.cartItem.deleteMany({ where: { cartId } });
-  revalidatePath("/basket");
-  revalidatePath("/order-history");
-  return order;
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+    revalidatePath("/basket");
+    revalidatePath("/order-history");
+    
+    return { success: true, message: "Zamówienie złożone pomyślnie!" };
+  } catch (error) {
+    console.error("Order creation failed:", error);
+    return { success: false, message: "Wystąpił błąd podczas składania zamówienia." };
+  }
 }

@@ -3,23 +3,21 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
-// Ten plik jest używany do tworzenia pojedynczej instancji Prisma z adapterem PG,
-// która jest następnie używana przez inne pliki lib.
-
 const connectionString = process.env.DATABASE_URL
 
-// Jeśli brakuje connectionString, może spowodować to błąd, ale jest to 
-// konieczne, gdy używamy adaptera PG
 if (!connectionString) {
   throw new Error("Brak DATABASE_URL w zmiennych środowiskowych")
 }
 
+// Używamy globalnego obiektu do singletona, ale z adapterem
+// W trybie produkcji (Vercel) Adapter musi zostać załadowany
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-// Upewnij się, że instancja prisma jest eksportowana jako 'prisma'
+// Jeśli to nie produkcja, używamy istniejącego globalnego, aby uniknąć ponownego tworzenia połączenia.
+// W produkcji tworzymy nową instancję.
 export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

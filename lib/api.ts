@@ -1,10 +1,14 @@
-import { prisma } from "@/lib/db"; // Upewniamy się, że importujemy named export 'prisma' z lib/db
+// lib/api.ts
+import { prisma } from "@/lib/db"; 
 
 export async function getProducts() {
   return await prisma.product.findMany({
     include: { category: true },
   });
 }
+
+// Dodajemy alias fetchProducts (fix dla "fetchProducts is not exported")
+export const fetchProducts = getProducts; 
 
 export async function getProductById(id: number) {
   return await prisma.product.findUnique({

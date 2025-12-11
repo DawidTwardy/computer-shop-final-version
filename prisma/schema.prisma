@@ -1,11 +1,10 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // UWAGA: Usunięto stąd "url", ponieważ w Prisma 7 jest on w prisma.config.ts
 }
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 enum OrderStatus {

@@ -1,12 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Naprawia błąd PostCSS "must export a plugins key"
-  postcss: {
-    plugins: {
-        tailwindcss: {},
-        autoprefixer: {},
-    }
-  },
+  // UWAGA: Usunięto klucz 'postcss' (został przeniesiony do postcss.config.mjs)
   
   webpack: (config, { isServer }) => {
     // Naprawia błąd "Module not found: Can't resolve 'fs/net/dns/tls'"

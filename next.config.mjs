@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // UWAGA: Usunięto klucz 'postcss' (został przeniesiony do postcss.config.mjs)
+  // UWAGA: Usunięto nieprawidłowy klucz 'postcss', który powodował błąd
   
   webpack: (config, { isServer }) => {
-    // Naprawia błąd "Module not found: Can't resolve 'fs/net/dns/tls'"
+    // Konfiguracja rozwiązująca problem "Can't resolve 'fs', 'net', etc."
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -32,7 +32,7 @@ const nextConfig = {
       };
     }
     
-    // Jawne ignorowanie modułów pg na kliencie (kluczowe dla adapterów Prisma)
+    // Jawne ignorowanie modułów pg na kliencie
     config.externals = [...config.externals, 'pg', 'pg-native']; 
 
     return config;

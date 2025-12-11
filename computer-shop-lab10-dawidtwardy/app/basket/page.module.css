@@ -1,0 +1,265 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #e5e5e1; /* Jasny tekst na ciemnym tle */
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #e5e5e1;
+}
+
+.emptyCart {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #bcbcb7;
+  margin-top: 3rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid #bcbcb7;
+}
+
+/* Lista produktów */
+.cartList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid #bcbcb7;
+  border-radius: 8px;
+  padding: 15px;
+  gap: 20px;
+}
+
+.itemImage {
+  border-radius: 4px;
+  background-color: #fff;
+  object-fit: contain;
+}
+
+.itemDetails {
+  flex-grow: 1;
+}
+
+.itemDetails h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.itemCode {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #bcbcb7;
+}
+
+.itemPrice {
+  font-weight: bold;
+  color: #fff;
+  margin: 5px 0 0 0;
+}
+
+.itemActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.quantityBadge {
+  background-color: #333;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  border: 1px solid #555;
+  color: #e5e5e1;
+}
+
+/* Przyciski */
+.removeBtn {
+  background-color: #7f1d1d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.removeBtn:hover {
+  background-color: #991b1b;
+}
+
+/* Sekcja podsumowania */
+.summary {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid #bcbcb7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.summaryRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.totalRow {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.totalPrice {
+  font-size: 1.5rem;
+  color: #059669; /* Zielony */
+  margin-left: 10px;
+}
+
+.checkoutBtn {
+  background-color: #059669;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.checkoutBtn:hover:not(:disabled) {
+  background-color: #047857;
+  transform: scale(1.05);
+}
+
+.clearBtn {
+  background-color: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.clearBtn:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Transfer */
+.transferSection {
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 1px solid #444;
+}
+
+.transferHeader {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #e5e5e1;
+}
+
+.transferForm {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.userSelect {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #bcbcb7;
+  background-color: #181817;
+  color: white;
+  min-width: 250px;
+}
+
+.transferBtn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.transferBtn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+/* User Header */
+.userHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #444;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .cartItem {
+    flex-direction: column;
+    text-align: center;
+  }
+  .itemActions {
+    width: 100%;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .summary {
+    flex-direction: column;
+    text-align: center;
+  }
+  .summaryRight {
+    flex-direction: column;
+    width: 100%;
+  }
+  .transferForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+.signOutBtn {
+  background-color: transparent;
+  color: #bcbcb7;
+  border: 1px solid #bcbcb7;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.signOutBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: #fff;
+}

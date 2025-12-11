@@ -1,0 +1,158 @@
+/* Tytuł strony */
+.title {
+  font-size: 2rem; /* Używanie rem jest lepsze dla dostępności niż px */
+  font-weight: 700;
+  color: #e5e5e1;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+/* Siatka produktów - Ulepszona responsywność */
+.productListGrid {
+  display: grid;
+  /* Ta linia automatycznie dobiera liczbę kolumn w zależności od szerokości ekranu 
+     (min. 280px szerokości karty), nie potrzebujesz tylu @media queries */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Karta produktu */
+.productListItem {
+  border: 1px solid #bcbcb7;
+  padding: 20px;
+  border-radius: 12px; /* Nieco bardziej zaokrąglone rogi wyglądają nowocześniej */
+  background-color: rgba(255, 255, 255, 0.05); /* Twoje tło */
+  text-align: center;
+  color: #e5e5e1;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+  /* Płynna animacja przy najechaniu */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Efekt najechania myszką na kartę */
+.productListItem:hover {
+  transform: translateY(-5px); /* Lekkie uniesienie */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+  border-color: #e5e5e1; /* Rozjaśnienie obramowania */
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Link wewnątrz karty */
+.productListItem a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  flex-grow: 1;
+  margin-bottom: 15px;
+}
+
+/* Kontener na zdjęcie */
+.productImageContainer {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Style tekstowe wewnątrz karty */
+.productListItem h4 {
+  font-size: 1.2rem;
+  margin: 10px 0;
+  font-weight: 600;
+}
+
+.productListItem p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+  color: #bcbcb7; /* Nieco ciemniejszy tekst dla mniej ważnych info */
+}
+
+.productListItem strong {
+  color: #fff; /* Cena na biało */
+  font-size: 1.1rem;
+}
+
+/* Style dla przycisku - Zastępują style inline */
+.addToCartBtn {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #bcbcb7;
+  color: #181817;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto; /* Dopycha przycisk do dołu */
+}
+
+.addToCartBtn:hover:not(:disabled) {
+  background-color: #e5e5e1;
+  transform: scale(1.02);
+}
+
+.addToCartBtn:disabled {
+  background-color: #555;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Loading / Error */
+.loading, .error {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 50px;
+  color: #bcbcb7;
+}
+
+/* Style sekcji filtrowania (dopasowane do ciemnego motywu) */
+.filterSection {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid #bcbcb7;
+  border-radius: 8px;
+}
+
+.filterHeader {
+  color: #e5e5e1;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #bcbcb7;
+  border: 1px solid #bcbcb7;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterBtn:hover, .filterBtnActive {
+  background-color: #bcbcb7;
+  color: #181817;
+  font-weight: bold;
+}

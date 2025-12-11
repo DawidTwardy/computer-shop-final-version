@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Podstawowe ustawienia */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  /* ZMIANA: Inter jest lepszy do czytania parametrów technicznych i cen */
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #181817;
+  margin: 0;
+  padding: 0;
+}
+
+/* Opcjonalnie: Nagłówki mogą zostać w Merriweather dla elegancji */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Merriweather', serif;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Twoje style nawigacji - zostawiam bez zmian */
+header nav ul a:hover,
+header nav ul a.active {
+  background-color: #bcbcb7;
+  color: #181817;
+  border-radius: 4px; /* Dodałem małe zaokrąglenie, żeby ładniej wyglądało */
+  transition: background-color 0.2s; /* Płynna zmiana koloru */
+}

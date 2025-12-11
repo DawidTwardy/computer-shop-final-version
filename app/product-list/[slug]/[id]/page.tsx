@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { fetchProductById, addToCart } from '@/lib/api';
+import { addToCart } from '@/lib/actions/cart'; // To jest poprawna lokalizacja akcji serwerowej
 import Image from 'next/image';
 
 interface Product {
@@ -165,3 +165,4 @@ export default function ProductDetail() {
     </main>
   );
 }
+

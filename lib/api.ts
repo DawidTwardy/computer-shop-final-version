@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/db"; // Upewniamy się, że importujemy named export 'prisma' z lib/db
 
 export async function getProducts() {
   return await prisma.product.findMany({
@@ -22,6 +22,13 @@ export async function getCategories() {
 export async function getProductsByCategory(categoryId: number) {
   return await prisma.product.findMany({
     where: { categoryId },
+    include: { category: true },
+  });
+}
+
+export async function getProductByCode(code: string) {
+  return await prisma.product.findUnique({
+    where: { code },
     include: { category: true },
   });
 }

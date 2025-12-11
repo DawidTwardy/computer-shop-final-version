@@ -1,10 +1,11 @@
+// lib/actions/cart.ts
 "use server"
 
 import { prisma } from "../db"
 import { revalidatePath } from "next/cache"
-import { OrderStatus } from "@prisma/client"; // Dodajemy OrderStatus
+import { OrderStatus } from "@prisma/client";
 
-// Odtworzona funkcja dodawania do koszyka (addToCart)
+// Akcja: Dodanie do koszyka (addToCart)
 export async function addToCart(productId: number, userId: string, quantity: number = 1) {
   const pId = Number(productId);
   const qty = Number(quantity);
@@ -119,7 +120,7 @@ export async function transferCart(fromUserId: string, toUserId: string) {
   return { success: true }
 }
 
-// Odtworzona funkcja czyszczenia koszyka (clearCart)
+// Akcja: Czyszczenie koszyka (clearCart)
 export async function clearCart(userId: string) {
   const cart = await prisma.cart.findUnique({ where: { userId } });
   if (cart) {
@@ -128,7 +129,7 @@ export async function clearCart(userId: string) {
   }
 }
 
-// Odtworzona funkcja usuwania elementu (removeItemFromCart)
+// Akcja: Usuwanie elementu z koszyka (removeItemFromCart)
 export async function removeItemFromCart(userId: string, productId: number) {
   const cart = await prisma.cart.findUnique({ where: { userId } });
   if (cart) {
@@ -141,7 +142,7 @@ export async function removeItemFromCart(userId: string, productId: number) {
   }
 }
 
-// Odtworzona funkcja składania zamówienia (placeOrder)
+// Akcja: Składanie zamówienia (placeOrder)
 export async function placeOrder(userId: string, cartId: number) {
   const DISCOUNT_RATE = 0.9;
   const cart = await prisma.cart.findUnique({

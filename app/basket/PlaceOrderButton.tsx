@@ -1,37 +1,44 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { placeOrder } from "@/lib/actions/cart"; // Poprawiony import
-import styles from "./page.module.css";
+import { useState } from "react";
+import { placeOrder } from "@/lib/actions/cart";
 
 interface PlaceOrderButtonProps {
   userId: string;
 }
 
 export default function PlaceOrderButton({ userId }: PlaceOrderButtonProps) {
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!confirm("Czy na pewno chcesz złożyć zamówienie?")) return;
 
-    startTransition(async () => {
-      try {
-        const res = await placeOrder(userId);
-        if(res.success) alert("Zamówienie zostało złożone pomyślnie!");
-        else alert("Błąd: " + res.message);
-      } catch (error) {
-        alert("Wystąpił błąd podczas składania zamówienia.");
+    setLoading(true);
+    try {
+      const res = await placeOrder(userId); 
+      
+      if (res.success) {
+        alert(res.message);
+      } else {
+        alert(`Błąd: ${res.message}`);
       }
-    });
+    } catch (error) {
+      console.error(error);
+      alert("Wystąpił błąd podczas składania zamówienia.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <button
       onClick={handlePlaceOrder}
-      disabled={isPending}
-      className={styles.checkoutBtn}
+      disabled={loading}
+      className={`bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+        loading ? "opacity-50 cursor-not-allowed" : ""
+      }`}
     >
-      {isPending ? "Przetwarzanie..." : "Złóż zamówienie"}
+      {loading ? "Przetwarzanie..." : "Złóż zamówienie"}
     </button>
   );
 }

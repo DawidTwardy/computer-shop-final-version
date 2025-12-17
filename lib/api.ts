@@ -1,4 +1,5 @@
-// lib/api.ts
+"use server"
+
 import { prisma } from "@/lib/db"; 
 
 export async function getProducts() {
@@ -7,7 +8,6 @@ export async function getProducts() {
   });
 }
 
-// Dodajemy alias fetchProducts (fix dla "fetchProducts is not exported")
 export const fetchProducts = getProducts; 
 
 export async function getProductById(id: number) {

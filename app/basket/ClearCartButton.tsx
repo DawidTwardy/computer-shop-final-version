@@ -1,6 +1,6 @@
 "use client";
 
-import { clearCart } from "@/lib/actions/cart"; // Poprawiony import (z @)
+import { clearCart } from "@/lib/actions/cart";
 import styles from "./page.module.css";
 import { useTransition } from "react";
 
@@ -14,7 +14,7 @@ export default function ClearCartButton({ userId }: ClearCartButtonProps) {
   const handleClear = () => {
     if (confirm("Czy na pewno chcesz wyczyścić cały koszyk?")) {
       startTransition(async () => {
-        await clearCart(userId);
+        await clearCart();
       });
     }
   };

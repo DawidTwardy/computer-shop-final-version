@@ -1,11 +1,8 @@
-// lab12/computer-shop-lab10-dawidtwardy/app/product-list/@discounts/default.tsx
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetchProducts } from '@/lib/api'; // Używamy API do pobierania danych
-import { slugifyCategoryName } from '@/lib/products'; 
+import { fetchProducts } from '@/lib/api';
+import { slugifyCategoryName } from '@/lib/products';
 
-// Interfejs zgodny z danymi zwracanymi przez API
 interface Product {
     id: number;
     name: string;
@@ -13,24 +10,19 @@ interface Product {
     type: string;
     price: number;
     amount: number;
-    image: string;
+    image: string | null;
     category: {
-        name: string; // Używane do generowania sluga
+        name: string;
     };
 }
 
-/**
- * Funkcja wybiera N losowych produktów dostępnych na stanie.
- */
 function getRandomProducts(products: Product[], n: number): Product[] {
-    // Filtrujemy tylko produkty dostępne na stanie
     const productsInStock = products.filter(p => p.amount > 0);
     
     if (productsInStock.length <= n) {
         return productsInStock;
     }
 
-    // Losowe tasowanie i wybór N elementów
     const shuffled = [...productsInStock].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, n);
 }
@@ -40,20 +32,13 @@ export default async function DiscountsDefault() {
     let fetchError = false;
 
     try {
-        // Logowanie debugowe do konsoli Next.js
-        console.log("DEBUG: Attempting to fetch products for @discounts slot.");
         allProducts = await fetchProducts();
-        if (allProducts.length === 0) {
-            console.warn("WARN: Fetch was successful, but no products were returned from API.");
-        }
     } catch (e) {
-        // Krytyczne logowanie błędu, jeśli pobieranie zawiedzie
-        console.error("FATAL ERROR: Failed to fetch products for Discounts component.", e);
+        console.error(e);
         fetchError = true;
     }
     
     if (fetchError) {
-        // Wyświetlenie komunikatu błędu w widoku, jeśli pobieranie się nie powiedzie
         return (
             <div className="p-4 bg-red-600/70 text-white rounded-lg">
                 ❌ Błąd krytyczny: Nie można załadować promocji (Błąd API).
@@ -72,13 +57,11 @@ export default async function DiscountsDefault() {
                     const originalPrice = p.price;
                     const discountedPrice = originalPrice * 0.9;
                     
-                    // GENEROWANIE POPRAWNEGO SLUGA
                     const categorySlug = slugifyCategoryName(p.category.name);
 
                     return (
                         <Link 
                             key={p.id} 
-                            // POPRAWIONY LINK: /product-list/[slug]/[id]
                             href={`/product-list/${categorySlug}/${p.id}`} 
                             className="flex items-center gap-3 p-3 bg-white/5 rounded-md hover:bg-white/10 transition-colors"
                         >

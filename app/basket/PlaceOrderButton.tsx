@@ -15,7 +15,7 @@ export default function PlaceOrderButton({ userId }: PlaceOrderButtonProps) {
 
     setLoading(true);
     try {
-      const res = await placeOrder(userId); 
+      const res = await placeOrder();
       
       if (res.success) {
         alert(res.message);

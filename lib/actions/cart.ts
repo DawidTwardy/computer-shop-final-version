@@ -3,37 +3,39 @@
 import { prisma } from "../db"
 import { revalidatePath } from "next/cache"
 import { OrderStatus } from "@prisma/client"
-import { auth } from "../auth" //
+import { auth } from "../auth"
 
-// Akcja: Dodanie do koszyka (addToCart)
 export async function addToCart(productId: number, quantity: number = 1) {
   const session = await auth();
   const userId = session?.user?.id;
 
   if (!userId) {
-     return null; // Lub rzuć błąd, jeśli wolisz
+     return { success: false, message: "Musisz być zalogowany, aby dodać produkt do koszyka" };
   }
 
   const pId = Number(productId);
   const qty = Number(quantity);
   
-  let cart = await prisma.cart.findUnique({ where: { userId } });
-  if (!cart) {
-    cart = await prisma.cart.create({ data: { userId } });
+  try {
+    let cart = await prisma.cart.findUnique({ where: { userId } });
+    if (!cart) {
+      cart = await prisma.cart.create({ data: { userId } });
+    }
+
+    await prisma.cartItem.upsert({
+      where: {
+        cartId_productId: { cartId: cart.id, productId: pId },
+      },
+      update: { quantity: { increment: qty } },
+      create: { cartId: cart.id, productId: pId, quantity: qty },
+    });
+    
+    revalidatePath("/basket")
+    return { success: true, message: "Produkt dodany do koszyka" };
+  } catch (error) {
+    return { success: false, message: "Wystąpił błąd podczas dodawania do koszyka" };
   }
-
-  const cartItem = await prisma.cartItem.upsert({
-    where: {
-      cartId_productId: { cartId: cart.id, productId: pId },
-    },
-    update: { quantity: { increment: qty } },
-    create: { cartId: cart.id, productId: pId, quantity: qty },
-  });
-  
-  revalidatePath("/basket")
-  return cartItem
 }
-
 
 export async function getCartWithItems(userId: string) {
   return await prisma.cart.findUnique({
@@ -127,7 +129,6 @@ export async function transferCart(fromUserId: string, toUserId: string) {
   return { success: true, message: "Przeniesiono pomyślnie" }
 }
 
-// Akcja: Czyszczenie koszyka (clearCart)
 export async function clearCart() {
   const session = await auth();
   const userId = session?.user?.id;
@@ -141,7 +142,6 @@ export async function clearCart() {
   }
 }
 
-// Akcja: Usuwanie elementu z koszyka (removeItemFromCart)
 export async function removeItemFromCart(productId: number) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -159,7 +159,6 @@ export async function removeItemFromCart(productId: number) {
   }
 }
 
-// Akcja: Składanie zamówienia (placeOrder) - ZINTEGROWANA WERSJA
 export async function placeOrder() {
   const session = await auth();
   const userId = session?.user?.id;

@@ -17,10 +17,9 @@ export default function AddToCartButton({ productId, price, productName }: AddTo
     setMessage("")
     startTransition(async () => {
       try {
-        const result = await addToCart(productId, 1) // Dodajemy 1 sztukę
+        const result = await addToCart(productId, 1)
         if (result.success) {
           setMessage("✅ Dodano!")
-          // Opcjonalnie: ukryj komunikat po 2 sekundach
           setTimeout(() => setMessage(""), 2000)
         } else {
           setMessage("❌ " + result.message)

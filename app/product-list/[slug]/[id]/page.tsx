@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { addToCart } from '@/lib/actions/cart'; // To jest poprawna lokalizacja akcji serwerowej
+import { addToCart } from '@/lib/actions/cart';
+import { getProductById } from '@/lib/api';
 import Image from 'next/image';
 
 interface Product {
@@ -12,8 +13,8 @@ interface Product {
   code: string;
   price: number;
   amount: number;
-  image?: string;
-  description?: string;
+  image?: string | null;
+  description?: string | null;
   type?: string;
   category?: { id: number; name: string };
 }
@@ -32,7 +33,7 @@ export default function ProductDetail() {
     const loadProduct = async () => {
       try {
         setLoading(true);
-        const data = await fetchProductById(productId);
+        const data = await getProductById(productId);
         if (!data) {
           setError('Produkt nie znaleziony');
         } else {
@@ -51,7 +52,7 @@ export default function ProductDetail() {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart(1, productId, quantity);
+      await addToCart(productId, quantity);
       alert(`Dodano ${quantity} szt. do koszyka!`);
       router.push('/basket');
     } catch (err) {
@@ -69,12 +70,11 @@ export default function ProductDetail() {
       </Link>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginTop: '20px' }}>
-        {/* Obraz */}
         <div>
           {product.image && (
             <div style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
               <Image
-                src={`/${product.image}`}
+                src={`/images/products/${product.image}`}
                 alt={product.name}
                 width={400}
                 height={400}
@@ -87,7 +87,6 @@ export default function ProductDetail() {
           )}
         </div>
 
-        {/* Szczegóły */}
         <div>
           <h1 style={{ marginTop: 0 }}>{product.name}</h1>
           
@@ -165,4 +164,3 @@ export default function ProductDetail() {
     </main>
   );
 }
-

@@ -3,9 +3,17 @@
 import { prisma } from "../db"
 import { revalidatePath } from "next/cache"
 import { OrderStatus } from "@prisma/client"
+import { auth } from "../auth" //
 
 // Akcja: Dodanie do koszyka (addToCart)
-export async function addToCart(productId: number, userId: string, quantity: number = 1) {
+export async function addToCart(productId: number, quantity: number = 1) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+     return null; // Lub rzuć błąd, jeśli wolisz
+  }
+
   const pId = Number(productId);
   const qty = Number(quantity);
   
@@ -120,7 +128,12 @@ export async function transferCart(fromUserId: string, toUserId: string) {
 }
 
 // Akcja: Czyszczenie koszyka (clearCart)
-export async function clearCart(userId: string) {
+export async function clearCart() {
+  const session = await auth();
+  const userId = session?.user?.id;
+  
+  if (!userId) return;
+
   const cart = await prisma.cart.findUnique({ where: { userId } });
   if (cart) {
     await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
@@ -129,7 +142,12 @@ export async function clearCart(userId: string) {
 }
 
 // Akcja: Usuwanie elementu z koszyka (removeItemFromCart)
-export async function removeItemFromCart(userId: string, productId: number) {
+export async function removeItemFromCart(productId: number) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) return;
+
   const cart = await prisma.cart.findUnique({ where: { userId } });
   if (cart) {
     await prisma.cartItem.delete({
@@ -142,7 +160,14 @@ export async function removeItemFromCart(userId: string, productId: number) {
 }
 
 // Akcja: Składanie zamówienia (placeOrder) - ZINTEGROWANA WERSJA
-export async function placeOrder(userId: string) {
+export async function placeOrder() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+      return { success: false, message: "Użytkownik niezalogowany" };
+  }
+
   const cart = await prisma.cart.findUnique({
     where: { userId },
     include: { items: { include: { product: true } } },
